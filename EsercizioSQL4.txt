@@ -1,0 +1,109 @@
+a. Visualizzare tutti gli impiegati oltre i 29 anni
+SELECT * FROM IMPIEGATO 
+WHERE DATEDIFF(YEAR, DataNascita, GETDATE()) > 29;
+
+b. Visualizzare tutti gli impiegati con un reddito di almeno 800 euro mensili
+SELECT * FROM IMPIEGATO 
+WHERE RedditoMensile >= 800;
+
+c. Visualizzare tutti gli impiegati che posseggono la detrazione fiscale
+SELECT * FROM IMPIEGATO 
+WHERE DetrazioneFiscale = 1;
+
+d. Visualizzare tutti gli impiegati che non posseggono la detrazione fiscale
+SELECT * FROM IMPIEGATO 
+WHERE DetrazioneFiscale = 0;
+
+e. Visualizzare tutti gli impiegati cui il cognome cominci con una lettera G e li visualizzi in ordine alfabetico
+SELECT * FROM IMPIEGATO 
+WHERE Cognome LIKE 'F%' ORDER BY Cognome;
+
+f. Visualizzare il numero totale degli impiegati registrati nella base dati
+SELECT COUNT(*) 
+AS NumeroTotaleImpiegati FROM IMPIEGATO;
+
+
+g. Visualizzare il totale dei redditi mensili di tutti gli impiegati
+SELECT SUM(RedditoMensile) 
+AS TotaleRedditiMensili FROM IMPIEGATO;
+
+h. Visualizzare la media dei redditi mensili di tutti gli impiegati
+SELECT AVG(RedditoMensile) 
+AS MediaRedditiMensili FROM IMPIEGATO;
+
+i. Visualizzare l’importo del reddito mensile maggiore
+SELECT MAX(RedditoMensile) 
+AS RedditoMensileMassimo FROM IMPIEGATO;
+
+j. Visualizzare l’importo del reddito mensile minore
+SELECT MIN(RedditoMensile) 
+AS RedditoMensileMinimo FROM IMPIEGATO;
+
+k. Visualizzare gli impiegati assunti dall’01/01/2007 all’01/01/2008
+SELECT * FROM IMPIEGATO 
+WHERE IDImpiegato 
+IN (SELECT IDImpiegato FROM IMPIEGO WHERE DataAssunzione BETWEEN '2007-01-01' AND '2008-01-01');
+
+l. Tramite una query parametrica che identifichi il tipo di impiego, visualizzare 
+tutti gli impiegati che corrispondono a quel tipo di impiego
+DECLARE @TipoImpiego NVARCHAR(50) = 'Programmatore';
+SELECT * FROM IMPIEGATO 
+WHERE IDImpiegato IN (SELECT IDImpiegato FROM IMPIEGO WHERE TipoImpiego = @TipoImpiego);
+
+
+m. Visualizzare l’età media dei lavoratori all’interno dell’azienda
+SELECT AVG(DATEDIFF(YEAR, DataNascita, GETDATE())) 
+AS MediaEtaLavoratori FROM IMPIEGATO;
+
+
+
+
+CREATE PROCEDURE InserisciImpiegato
+    @IDImpiegato INT,
+    @Cognome NVARCHAR(50),
+    @Nome NVARCHAR(50),
+    @CodiceFiscale NVARCHAR(16),
+    @DataNascita DATE,
+    @RedditoMensile DECIMAL(10, 2),
+    @DetrazioneFiscale BIT
+AS
+BEGIN
+    INSERT INTO IMPIEGATO (IDImpiegato, Cognome, Nome, CodiceFiscale, DataNascita, RedditoMensile, DetrazioneFiscale)
+    VALUES (@IDImpiegato, @Cognome, @Nome, @CodiceFiscale, @DataNascita, @RedditoMensile, @DetrazioneFiscale);
+END;
+
+
+
+CREATE PROCEDURE AggiornaImpiegato
+    @IDImpiegato INT,
+    @Cognome NVARCHAR(50),
+    @Nome NVARCHAR(50),
+    @CodiceFiscale NVARCHAR(16),
+    @DataNascita DATE,
+    @RedditoMensile DECIMAL(10, 2),
+    @DetrazioneFiscale BIT,
+    @DataAssunzione DATETIME
+AS
+BEGIN
+    UPDATE IMPIEGATO
+    SET Cognome = @Cognome,
+        Nome = @Nome,
+        CodiceFiscale = @CodiceFiscale,
+        DataNascita = @DataNascita,
+        RedditoMensile = @RedditoMensile,
+        DetrazioneFiscale = @DetrazioneFiscale,
+        DataAssunzione = @DataAssunzione
+    WHERE IDImpiegato = @IDImpiegato;
+END;
+
+
+
+CREATE PROCEDURE EliminaImpiegato
+    @IDImpiegato INT
+AS
+BEGIN
+    DELETE FROM IMPIEGATO
+    WHERE IDImpiegato = @IDImpiegato;
+END;
+
+
